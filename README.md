@@ -1,6 +1,6 @@
-# 📦 Streamlit App Starter Kit 
+# 📦 Enhanced-Disease-Prediction-Webapp
 ```
-⬆️ (Replace above with your app's name)
+⬆️ Enhanced-Disease-Prediction-Webapp
 ```
 
 Description of the app ...
