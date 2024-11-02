@@ -1,93 +1,158 @@
 import streamlit as st
 import pandas as pd
-from sklearn.impute import SimpleImputer
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+import numpy as np
+import joblib
+from pathlib import Path
+from PIL import Image
+from streamlit_option_menu import option_menu
 
-st.title('🎈 Enhanced-Disease-Prediction-Webapp')
-st.info('This App is built to predict diseases using various trained models')
+class HeartDiseasePredictor:
+    def __init__(self, model_path):
+        """Initialize the predictor with model path."""
+        self.model = joblib.load(model_path)
+    
+    def predict(self, features_df):
+        """Make prediction and return prediction and probabilities."""
+        prediction = self.model.predict(features_df)
+        prediction_proba = self.model.predict_proba(features_df)
+        return prediction[0], prediction_proba[0]
 
-# Load the dataset
-df = pd.read_csv('https://raw.githubusercontent.com/Tony-Kara/Enhanced-Disease-Prediction-Webapp/refs/heads/master/Dataset/heart.csv')
+class ImageLoader:
+    def __init__(self, image_dir):
+        """Initialize with image directory path."""
+        self.image_dir = Path(image_dir)
+    
+    def load_image(self, image_name):
+        """Load and return image from the images directory."""
+        return Image.open(self.image_dir / image_name)
 
-with st.expander('Data'):
-    st.write('**Raw data**')
-    st.dataframe(df)
+def create_feature_input():
+    """Create and return dictionary of user inputs."""
+    inputs = {}
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        inputs['age'] = st.number_input("Age", min_value=1, max_value=100, value=40)
+        
+    with col2:
+        gender = st.selectbox("Gender", ["Male", "Female"])
+        inputs['sex'] = 1 if gender == "Male" else 0
+        
+    with col3:
+        chest_pain = st.selectbox(
+            "Chest Pain Type",
+            ["Typical Angina", "Atypical Angina", "Non-Anginal Pain", "Asymptomatic"]
+        )
+        cp_values = {
+            "Typical Angina": 0,
+            "Atypical Angina": 1,
+            "Non-Anginal Pain": 2,
+            "Asymptomatic": 3
+        }
+        inputs['cp'] = cp_values[chest_pain]
+    
+    with col1:
+        inputs['trestbps'] = st.number_input("Resting Blood Pressure", min_value=0, max_value=200, value=120)
+        
+    with col2:
+        inputs['chol'] = st.number_input("Serum Cholesterol", min_value=0, max_value=600, value=200)
+        
+    with col3:
+        ecg = st.selectbox(
+            "Resting ECG",
+            ["Normal", "ST-T Wave Abnormality", "Left Ventricular Hypertrophy"]
+        )
+        ecg_values = {
+            "Normal": 0,
+            "ST-T Wave Abnormality": 1,
+            "Left Ventricular Hypertrophy": 2
+        }
+        inputs['restecg'] = ecg_values[ecg]
+    
+    with col1:
+        inputs['thalach'] = st.number_input("Max Heart Rate Achieved", min_value=0, max_value=250, value=150)
+        
+    with col2:
+        inputs['oldpeak'] = st.number_input("ST Depression", min_value=0.0, max_value=10.0, value=0.0)
+        
+    with col3:
+        slope = st.selectbox("Peak Exercise ST Segment", ["Upsloping", "Flat", "Downsloping"])
+        inputs['slope'] = {"Upsloping": 0, "Flat": 1, "Downsloping": 2}[slope]
+    
+    with col1:
+        inputs['ca'] = st.number_input("Number of Major Vessels", min_value=0, max_value=3, value=0)
+        
+    with col2:
+        thal = st.selectbox("Thalassemia", ["Normal", "Fixed Defect", "Reversible Defect"])
+        inputs['thal'] = {"Normal": 0, "Fixed Defect": 1, "Reversible Defect": 2}[thal]
+        
+    with col3:
+        inputs['exang'] = 1 if st.checkbox('Exercise Induced Angina') else 0
+        
+    with col1:
+        inputs['fbs'] = 1 if st.checkbox('Fasting Blood Sugar > 120 mg/dl') else 0
+    
+    return inputs
 
-    st.write('**X**')
-    X_raw = df.drop('target', axis=1)
-    st.write(X_raw)
+def heart_disease_page():
+    st.title("Heart Disease Prediction")
+    
+    # Initialize image loader
+    image_loader = ImageLoader('Images')
+    
+    # Display header image
+    header_image = image_loader.load_image('heart2.jpg')
+    st.image(header_image, caption='Heart Disease Prediction')
+    
+    # Get user name
+    name = st.text_input("Name:")
+    
+    # Get feature inputs
+    inputs = create_feature_input()
+    
+    # Create prediction button
+    if st.button("Heart Test Result"):
+        # Prepare features for prediction
+        features = pd.DataFrame([inputs])
+        
+        # Initialize predictor and make prediction
+        predictor = HeartDiseasePredictor("Models/heart_model.sav")
+        prediction, probabilities = predictor.predict(features)
+        
+        # Display results
+        if prediction == 1:
+            result_image = image_loader.load_image('positive.jpg')
+            message = 'We are really sorry to say but it seems like you have Heart Disease.'
+        else:
+            result_image = image_loader.load_image('negative.jpg')
+            message = "Congratulations, you don't have Heart Disease."
+            
+        st.image(result_image, caption='')
+        st.success(f"{name}, {message}")
+        
+        # Display prediction probabilities
+        st.write("\nPrediction Probabilities:")
+        st.write(f"Probability of No Heart Disease: {probabilities[0]:.2f}")
+        st.write(f"Probability of Heart Disease: {probabilities[1]:.2f}")
 
-    st.write('**y**')
-    y_raw = df.target
-    st.write(y_raw)
+def main():
+    st.title('🎈 Enhanced-Disease-Prediction-Webapp')
+    st.info('This App is built to predict diseases using various trained models')
+    
+    # Sidebar navigation
+    with st.sidebar:
+        selected = option_menu(
+            'Multiple Disease Prediction',
+            ['Disease Prediction', 'Heart Disease Prediction', 'Mesothelioma Prediction'],
+            icons=['', 'activity', 'heart'],
+            default_index=0
+        )
+    
+    # Page routing
+    if selected == 'Heart Disease Prediction':
+        heart_disease_page()
+    # Add other pages here...
 
-# Input features
-with st.sidebar:
-    st.header('Input features')
-    age = st.slider('age', 32.1, 59.6, 43.9)
-    sex = st.selectbox('sex', ('male', 'female'))
-    cp = st.slider('cp (mm)', 13.1, 21.5, 17.2)
-    trestbps = st.slider('trestbps (mm)', 172.0, 231.0, 201.0)
-    chol = st.slider('chol (g)', 2700.0, 6300.0, 4207.0)
-
-    # Create a DataFrame for the input features
-    data = {
-        'age': age,
-        'sex': sex,
-        'cp': cp,
-        'ftrestbps': trestbps,
-        'chol': chol,
-    }
-    input_df = pd.DataFrame(data, index=[0])
-
-# Concatenate the input features with X_raw
-input_penguins = pd.concat([input_df, X_raw], axis=0)
-
-# Fill missing values with zero
-imputer = SimpleImputer(strategy='constant', fill_value=0)
-input_penguins = pd.DataFrame(imputer.fit_transform(input_penguins), columns=input_penguins.columns)
-
-with st.expander('Input features'):
-    st.write('**Input DataFrame**')
-    st.write(input_df)
-    st.write('**Combined DataFrame with Imputed Values**')
-    st.write(input_penguins)
-
-# Data preparation
-# One-hot encode the categorical columns automatically
-df_penguins = pd.get_dummies(input_penguins)
-
-X = df_penguins[1:]  # All features except the first row (user input)
-y = y_raw             # Target labels
-input_row = df_penguins[:1]  # The first row for the user input
-
-# Split data into training and test sets for accuracy calculation
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-with st.expander('Data preparation'):
-    st.write('**X (features)**')
-    st.write(input_row)
-    st.write('**y**')
-    st.write(y)
-
-# Model training and inference
-# Train the ML model
-clf = RandomForestClassifier()
-clf.fit(X_train, y_train)
-
-# Calculate accuracy on the test set
-y_pred = clf.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-
-# Display accuracy
-st.write(f"Model Accuracy on Test Set: {accuracy:.2f}")
-
-# Apply model to make predictions for user input
-prediction = clf.predict(input_row)
-prediction_proba = clf.predict_proba(input_row)
-
-st.write("Prediction Probability")
-st.write(f"Probability of No Heart Disease based on user input: {prediction_proba[0][0]:.2f}")
-st.write(f"Probability of Heart Disease based on user input: {prediction_proba[0][1]:.2f}")
+if __name__ == "__main__":
+    main()
