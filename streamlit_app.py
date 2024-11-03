@@ -128,26 +128,49 @@ def main():
 
                 # Show results if prediction was successful
                 if prediction is not None:
-                    st.markdown("### 📊 Results")
-                    col1, col2 = st.columns(2)
+                    st.markdown("### 📊 Assessment Results")
 
-                    with col1:
-                        if prediction == 1:
-                            st.markdown(
-                                f'<div class="prediction-badge positive">High Risk</div>',
-                                unsafe_allow_html=True,
-                            )
-                        else:
-                            st.markdown(
-                                f'<div class="prediction-badge negative">Low Risk</div>',
-                                unsafe_allow_html=True,
-                            )
+                    # Display prediction with improved styling
+                    if prediction == 1:
+                        st.markdown(
+                            """
+                            <div style='
+                                background-color: #fde8e8;
+                                padding: 20px;
+                                border-radius: 10px;
+                                text-align: center;
+                                margin-bottom: 20px;
+                                border: 2px solid #e53e3e;
+                            '>
+                                <h2 style='color: #e53e3e; margin: 0;'>High Risk</h2>
+                                <p style='margin: 10px 0 0 0; color: #666;'>
+                                    Please consult with a healthcare provider
+                                </p>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.markdown(
+                            """
+                            <div style='
+                                background-color: #e6ffed;
+                                padding: 20px;
+                                border-radius: 10px;
+                                text-align: center;
+                                margin-bottom: 20px;
+                                border: 2px solid #0e9f6e;
+                            '>
+                                <h2 style='color: #0e9f6e; margin: 0;'>Low Risk</h2>
+                                <p style='margin: 10px 0 0 0; color: #666;'>
+                                    Continue maintaining good heart health
+                                </p>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
 
-                    with col2:
-                        st.markdown(f"Confidence: {probabilities[1]:.2%}")
-                        st.progress(probabilities[1])
-
-                    # Show health advisor
+                    # Show health advisor without probabilities
                     show_heart_health_advisor(prediction)
 
             except Exception as e:
