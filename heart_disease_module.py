@@ -17,7 +17,7 @@ class HeartDiseasePredictor:
             print(f"Error loading model or scaler: {str(e)}")
     
     def predict(self, features_df):
-        """Scale features and make prediction"""
+        """Scale features and make inverted prediction"""
         try:
             print("\nOriginal Input Features:")
             print(features_df)
@@ -26,14 +26,19 @@ class HeartDiseasePredictor:
             print("\nScaled Features:")
             print(pd.DataFrame(scaled_features, columns=features_df.columns))
             
-            prediction = self.model.predict(scaled_features)
-            prediction_proba = self.model.predict_proba(scaled_features)
+            # Original prediction and probability
+            original_prediction = self.model.predict(scaled_features)
+            original_prediction_proba = self.model.predict_proba(scaled_features)
             
-            print("\nPrediction Results:")
-            print(f"Prediction: {'High Risk' if prediction[0] == 1 else 'Low Risk'}")
-            print(f"Confidence: {prediction_proba[0][1]:.2%}")
+            # Invert the prediction and probability
+            inverted_prediction = 1 - original_prediction[0]  # 1 becomes 0, and 0 becomes 1
+            inverted_probabilities = [1 - original_prediction_proba[0][1], original_prediction_proba[0][1]]
             
-            return prediction[0], prediction_proba[0]
+            print("\nInverted Prediction Results:")
+            print(f"Prediction: {'High Risk' if inverted_prediction == 1 else 'Low Risk'}")
+            print(f"Confidence: {inverted_probabilities[1]:.2%}")
+            
+            return inverted_prediction, inverted_probabilities
         except Exception as e:
             print(f"Prediction Error: {str(e)}")
             return None, None
