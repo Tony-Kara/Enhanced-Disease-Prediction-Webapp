@@ -18,12 +18,10 @@ from mesothelioma_module import (
 )
 
 
-# Custom CSS for modern styling
 def load_css():
     st.markdown(
         """
         <style>
-        /* Modern Card Styling */
         .stCard {
             border-radius: 15px;
             padding: 20px;
@@ -32,7 +30,6 @@ def load_css():
             margin-bottom: 20px;
         }
         
-        /* Gradient Button */
         .stButton>button {
             background: linear-gradient(to right, #3498db, #2980b9);
             color: white;
@@ -42,13 +39,11 @@ def load_css():
             transition: all 0.3s ease;
         }
         
-        /* Hover effect for button */
         .stButton>button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         
-        /* Results Container */
         .results-container {
             padding: 20px;
             border-radius: 15px;
@@ -56,7 +51,6 @@ def load_css():
             margin-top: 20px;
         }
         
-        /* Prediction Badge */
         .prediction-badge {
             padding: 10px 20px;
             border-radius: 25px;
@@ -75,7 +69,7 @@ def load_css():
             color: #0e9f6e;
         }
         </style>
-    """,
+        """,
         unsafe_allow_html=True,
     )
 
@@ -98,13 +92,7 @@ def main():
             default_index=0,
         )
 
-    # Disease Prediction Section
-    if selected == "Disease Prediction":
-        st.title("General Disease Prediction")
-        st.write("This feature is coming soon!")
-
-    # Heart Disease Section
-    elif selected == "Heart Disease Prediction":
+    if selected == "Heart Disease Prediction":
         st.title("🫀 Heart Disease Prediction")
 
         try:
@@ -113,7 +101,6 @@ def main():
         except Exception as e:
             print(f"Error loading image: {e}")
 
-        # Get user inputs
         inputs = create_heart_input_form()
 
         if st.button("Analyze Heart Health", key="predict_button"):
@@ -121,19 +108,69 @@ def main():
             my_bar = st.progress(0, text=progress_text)
 
             try:
-                # Create predictor instance
                 predictor = HeartDiseasePredictor(
                     "Models/heart_model.sav", "Models/heart_scaler.sav"
                 )
 
-                # Rest of your heart disease prediction code...
-                # [Previous heart disease code remains the same]
+                features_df = pd.DataFrame([inputs])
+                prediction, probabilities = predictor.predict(features_df)
+
+                for percent_complete in range(100):
+                    time.sleep(0.01)
+                    my_bar.progress(percent_complete + 1, text=progress_text)
+
+                if prediction is not None:
+                    st.markdown("### 📊 Assessment Results")
+
+                    if prediction == 1:
+                        st.markdown(
+                            """
+                            <div style='
+                                background-color: #fde8e8;
+                                padding: 20px;
+                                border-radius: 10px;
+                                text-align: center;
+                                margin-bottom: 20px;
+                                border: 2px solid #e53e3e;
+                            '>
+                                <h2 style='color: #e53e3e; margin: 0;'>High Risk</h2>
+                                <p style='margin: 10px 0 0 0; color: #666;'>
+                                    Please consult with a healthcare provider
+                                </p>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.markdown(
+                            """
+                            <div style='
+                                background-color: #e6ffed;
+                                padding: 20px;
+                                border-radius: 10px;
+                                text-align: center;
+                                margin-bottom: 20px;
+                                border: 2px solid #0e9f6e;
+                            '>
+                                <h2 style='color: #0e9f6e; margin: 0;'>Low Risk</h2>
+                                <p style='margin: 10px 0 0 0; color: #666;'>
+                                    Continue maintaining good heart health
+                                </p>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+
+                    show_heart_health_advisor(prediction)
 
             except Exception as e:
                 st.error(f"An error occurred during prediction: {str(e)}")
                 print(f"Prediction error: {str(e)}")
 
-    # Mesothelioma Section
+    elif selected == "Disease Prediction":
+        st.title("General Disease Prediction")
+        st.write("This feature is coming soon!")
+
     elif selected == "Mesothelioma Prediction":
         st.title("🫁 Mesothelioma Prediction")
 
@@ -143,7 +180,6 @@ def main():
         except Exception as e:
             print(f"Error loading image: {e}")
 
-        # Get user inputs
         inputs = create_mesothelioma_input_form()
 
         if st.button("Analyze Mesothelioma Risk", key="predict_meso_button"):
@@ -151,29 +187,21 @@ def main():
             my_bar = st.progress(0, text=progress_text)
 
             try:
-                # Create predictor instance
                 predictor = MesotheliomaPredictor(
-                    "Models/mesothelioma_model.sav",
-                    "Models/mesothelioma_scaler.sav",
+                    "Models/mesothelioma_model.sav", "Models/mesothelioma_scaler.sav"
                 )
 
-                # Prepare features DataFrame
                 features_df = pd.DataFrame([inputs])
-
-                # Make prediction
                 prediction, probabilities = predictor.predict(features_df)
 
-                # Animate progress bar
                 for percent_complete in range(100):
                     time.sleep(0.01)
                     my_bar.progress(percent_complete + 1, text=progress_text)
 
-                # Show results if prediction was successful
                 if prediction is not None:
                     st.markdown("### 📊 Assessment Results")
 
-                    # Display prediction with styling
-                    if prediction == 2:  # Mesothelioma
+                    if prediction == 2:
                         st.markdown(
                             """
                             <div style='
@@ -212,7 +240,6 @@ def main():
                             unsafe_allow_html=True,
                         )
 
-                    # Show health advisor
                     show_mesothelioma_health_advisor(prediction)
 
             except Exception as e:
