@@ -11,6 +11,11 @@ from heart_disease_module import (
     create_heart_input_form,
     show_heart_health_advisor,
 )
+from mesothelioma_module import (
+    MesotheliomaPredictor,
+    create_mesothelioma_input_form,
+    show_mesothelioma_health_advisor,
+)
 
 
 # Custom CSS for modern styling
@@ -93,7 +98,13 @@ def main():
             default_index=0,
         )
 
-    if selected == "Heart Disease Prediction":
+    # Disease Prediction Section
+    if selected == "Disease Prediction":
+        st.title("General Disease Prediction")
+        st.write("This feature is coming soon!")
+
+    # Heart Disease Section
+    elif selected == "Heart Disease Prediction":
         st.title("🫀 Heart Disease Prediction")
 
         try:
@@ -115,6 +126,37 @@ def main():
                     "Models/heart_model.sav", "Models/heart_scaler.sav"
                 )
 
+                # Rest of your heart disease prediction code...
+                # [Previous heart disease code remains the same]
+
+            except Exception as e:
+                st.error(f"An error occurred during prediction: {str(e)}")
+                print(f"Prediction error: {str(e)}")
+
+    # Mesothelioma Section
+    elif selected == "Mesothelioma Prediction":
+        st.title("🫁 Mesothelioma Prediction")
+
+        try:
+            image = Image.open("Images/mesothelioma.jpg")
+            st.image(image, caption="Mesothelioma Prediction")
+        except Exception as e:
+            print(f"Error loading image: {e}")
+
+        # Get user inputs
+        inputs = create_mesothelioma_input_form()
+
+        if st.button("Analyze Mesothelioma Risk", key="predict_meso_button"):
+            progress_text = "Analyzing your health data..."
+            my_bar = st.progress(0, text=progress_text)
+
+            try:
+                # Create predictor instance
+                predictor = MesotheliomaPredictor(
+                    "Models/mesothelioma_model.sav",
+                    "Models/mesothelioma_scaler.sav",
+                )
+
                 # Prepare features DataFrame
                 features_df = pd.DataFrame([inputs])
 
@@ -130,8 +172,8 @@ def main():
                 if prediction is not None:
                     st.markdown("### 📊 Assessment Results")
 
-                    # Display prediction with improved styling
-                    if prediction == 1:
+                    # Display prediction with styling
+                    if prediction == 2:  # Mesothelioma
                         st.markdown(
                             """
                             <div style='
@@ -142,9 +184,9 @@ def main():
                                 margin-bottom: 20px;
                                 border: 2px solid #e53e3e;
                             '>
-                                <h2 style='color: #e53e3e; margin: 0;'>High Risk</h2>
+                                <h2 style='color: #e53e3e; margin: 0;'>High Risk of Mesothelioma</h2>
                                 <p style='margin: 10px 0 0 0; color: #666;'>
-                                    Please consult with a healthcare provider
+                                    Immediate medical consultation recommended
                                 </p>
                             </div>
                             """,
@@ -163,27 +205,19 @@ def main():
                             '>
                                 <h2 style='color: #0e9f6e; margin: 0;'>Low Risk</h2>
                                 <p style='margin: 10px 0 0 0; color: #666;'>
-                                    Continue maintaining good heart health
+                                    Continue regular health monitoring
                                 </p>
                             </div>
                             """,
                             unsafe_allow_html=True,
                         )
 
-                    # Show health advisor without probabilities
-                    show_heart_health_advisor(prediction)
+                    # Show health advisor
+                    show_mesothelioma_health_advisor(prediction)
 
             except Exception as e:
                 st.error(f"An error occurred during prediction: {str(e)}")
                 print(f"Prediction error: {str(e)}")
-
-    elif selected == "Disease Prediction":
-        st.title("General Disease Prediction")
-        st.write("This feature is coming soon!")
-
-    elif selected == "Mesothelioma Prediction":
-        st.title("Mesothelioma Prediction")
-        st.write("This feature is coming soon!")
 
 
 if __name__ == "__main__":
