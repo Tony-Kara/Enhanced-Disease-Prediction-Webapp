@@ -9,7 +9,6 @@ class MesotheliomaPredictor:
         self.scaler = joblib.load(scaler_path)
 
     def predict(self, features_df):
-        # Ensure feature names match exactly
         expected_features = [
             "age",
             "city",
@@ -32,7 +31,6 @@ class MesotheliomaPredictor:
             "C-reactive protein (CRP)",
         ]
 
-        # Reorder columns to match training data
         features_df = features_df[expected_features]
 
         scaled_features = self.scaler.transform(features_df)
@@ -146,7 +144,6 @@ def create_mesothelioma_input_form():
                 "C-reactive Protein (CRP)", min_value=0, max_value=300, value=10
             )
 
-        # Return dictionary with exact feature names matching the model
         return {
             "age": age,
             "city": city,
@@ -173,7 +170,7 @@ def create_mesothelioma_input_form():
 def show_mesothelioma_health_advisor(prediction):
     st.markdown("### 👨‍⚕️ Health Advisor")
     with st.expander("Click for Recommendations and Information"):
-        if prediction == 2:  # Mesothelioma
+        if prediction == 2:
             st.error(
                 "Based on the analysis, immediate medical attention is recommended:"
             )
