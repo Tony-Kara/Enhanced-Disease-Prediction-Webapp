@@ -18,7 +18,7 @@ Streamlit
 Machine Learning (e.g., scikit-learn)
 Jupyter Notebook
 
-[![Streamlit App](https://tonykara-disease-prediction- webapp.streamlit.app/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://tonykara-disease-prediction-webapp.streamlit.app/)
 
 
 
