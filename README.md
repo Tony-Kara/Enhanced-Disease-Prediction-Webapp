@@ -5,7 +5,19 @@
 
 Description of the app ...
 
-## Demo App
+This repository contains an enhanced disease prediction web application built using Streamlit, a Python library for creating interactive web applications. The application aims to provide accurate predictions for various diseases, including heart disease and mesothelioma.
+
+Main Function Points
+Provides a user-friendly web interface for disease prediction
+Utilizes machine learning models to make accurate disease predictions
+Includes datasets and trained models for heart disease and mesothelioma
+Allows users to upload their own data for disease prediction
+Offers a clean and intuitive user experience
+Technology Stack
+Python
+Streamlit
+Machine Learning (e.g., scikit-learn)
+Jupyter Notebook
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://app-starter-kit.streamlit.app/)
 
@@ -13,13 +25,4 @@ Description of the app ...
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/app-starter-kit?quickstart=1)
 
-## Section Heading
 
-This is filler text, please replace this with text for this section.
-
-## Further Reading
-
-This is filler text, please replace this with a explanatory text about further relevant resources for this repo
-- Resource 1
-- Resource 2
-- Resource 3
