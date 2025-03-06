@@ -2,6 +2,7 @@
 ```
 ⬆️ Enhanced-Disease-Prediction-Webapp
 ```
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://tonykara-disease-prediction-webapp.streamlit.app/)
 
 This repository contains an enhanced disease prediction web application built using Streamlit, a Python library for creating interactive web applications. The application aims to provide accurate predictions for various diseases, including heart disease and mesothelioma.
 
